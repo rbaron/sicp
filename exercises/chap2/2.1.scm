@@ -59,7 +59,22 @@
 ; doesn't work very well for negative numbers. E.g.:
 ; (gcd -4 12) = -4, which is wrong, since it should be 4.
 ; If we simply comment out our `gcd` procedure, `make-rat-nicer` will use the
-; builtin, correct-for-negative-numbers, `gcd` algorithm and will yield
-; the correct results.
+; builtin, correct-for-negative-numbers `gcd` algorithm and will yield
+; the correct results. Another option would be to correct our `gcd` prodecure:
 
+(define (gcd2 a b)
+  (if (= b 0)
+    (abs a)
+    (gcd2 b (remainder a b))))
 
+(define (make-rat-nicer2 n d)
+  (let ((g (gcd2 n d)))
+    (if (< d 0)
+      (cons (/ (* n -1) g) (/ (* d -1) g))
+      (cons (/ n g) (/ d g)))))
+
+; Testcases
+(print-rat (make-rat-nicer2 5 4))
+(print-rat (make-rat-nicer2 -5 4))
+(print-rat (make-rat-nicer2 5 -4))
+(print-rat (make-rat-nicer2 -5 -4))
