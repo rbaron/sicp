@@ -49,9 +49,9 @@
 ; For a 11-digit number:
 (search-for-primes 10000000001 0)
 
-10000000019 *** .07
-10000000033 *** .08
-10000000061 *** .07
+; 10000000019 *** .07
+; 10000000033 *** .08
+; 10000000061 *** .07
 
 ; In general the speedup was from around .1s to .07s (70% of the original time)
 
@@ -59,18 +59,18 @@
 ; For a 12-digit number:
 (search-for-primes 100000000001 0)
 
-100000000003 *** .24
-100000000019 *** .21999999999999997
-100000000057 *** .21999999999999997
+; 100000000003 *** .24
+; 100000000019 *** .21999999999999997
+; 100000000057 *** .21999999999999997
 
 ; Speedup was from around .34s to .22s (64% of the original time)
 
 ; For a 13-digit number:
 (search-for-primes 1000000000001 0)
 
-1000000000039 *** .6800000000000002
-1000000000061 *** .7000000000000002
-1000000000063 *** .6699999999999999
+; 1000000000039 *** .6800000000000002
+; 1000000000061 *** .7000000000000002
+; 1000000000063 *** .6699999999999999
 
 ; Speedup was from around 1.09s to .69s (63% of the original time)
 
@@ -80,7 +80,3 @@
 ; The probable cause is that we now have introduced a few more instructions
 ; on your procedure, since our `next` procedure has to evaluate an `if` predicate
 ; on every run.
-; If we would like to speculate a little further, we coult probably argue
-; the processor is more efficient in testing the primality of multiples of 2,
-; since divisions can be treated as simple left shifts. It would be nice to
-; benchmark this assumption too.

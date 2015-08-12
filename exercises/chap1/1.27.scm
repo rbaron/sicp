@@ -5,7 +5,6 @@
 ; Non-primes _may_ also  satisfy the equation.
 
 
-
 ; Instead of using the given `fast-prime?` procedure, let's write one that
 ; runs the fermat test agains every a for 0 <= a < n.
 

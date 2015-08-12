@@ -30,14 +30,14 @@
 (define (cube-root x) (cube-root-iter 1.0 x))
 
 
-Sample output
-=============
-
-> (cube-root -512)
-  ...
-  ;Value: -8.000000025890593
-
-
-> (cube-root 8)
-  ...
-  ;Value: 2.000004911675504
+; Sample output
+; =============
+;
+; > (cube-root -512)
+;   ...
+;   ;Value: -8.000000025890593
+;
+;
+; > (cube-root 8)
+;   ...
+;   ;Value: 2.000004911675504
