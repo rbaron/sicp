@@ -21,7 +21,7 @@
  (lambda (f) (lambda (x) (f ((lambda (y) y) x))))
  (lambda (f) (lambda (x) (f x)))
 
- ; This means we can write `one` only  in terms of `f` and `x`, which substituting
+ ; This means we can write `one` only  in terms of `f` and `x`, which I'm substituting
  ; for `h` and `z`, respectively:
 
  (define one
@@ -40,6 +40,7 @@
 (define two
    (lambda (f) (lambda (x) (f (f x)))))
 
+; Now we can kind of see a trend...
 (define three
    (lambda (f) (lambda (x) (f (f (f x))))))
 
@@ -49,7 +50,7 @@
 ; Can we generalize successive calls to `add-1` with a `+` procedure?
 
 ; Signature: (define (+ a b) ???)
-; `a` is a procedure that receives a procedure and applyes it `a` times on a given argument.
+; `a` is a procedure that receives a procedure and applies it `a` times on a given argument.
 ; The same works for b. Ideally, we want `(+ a b)` to be a procedure that receives a procedure
 ; as argument and applies it `a+b` times on a given argument.
 
