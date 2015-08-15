@@ -1,5 +1,5 @@
 ; The exercise asks us to represent pais of nonnegative integers
-; using only the integer that is the product of 2^a * 3^b
+; `(a, b)` using only the integer that is the product of 2^a * 3^b
 
 ; `cons` should produce the said integer
 (define (cons a b)
@@ -7,7 +7,7 @@
     (expt 2 a)
     (expt 3 b)))
 
-; `cdr` should received the said integer `i` and return `b`.
+; `cdr` should receive the said integer `i` and return `b`.
 ; Initial idea: keep dividing `i` by 2 until the result is odd,
 ; at which point `i` will be 3^`b`. Take the log base 3
 ; of that and we have `b`.
