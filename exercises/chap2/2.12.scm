@@ -19,7 +19,7 @@
 (define (width i)
   (/ (- (upper-bound i) (lower-bound i)) 2))
 
-; Solution (assument tol is already divided by 100)
+; Solution (assuming tol is already divided by 100)
 (define (make-center-percent midpoint tol)
   (make-center-width midpoint (* midpoint tol)))
 
