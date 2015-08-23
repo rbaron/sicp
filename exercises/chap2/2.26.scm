@@ -8,7 +8,7 @@
 
 (cons x y)
 ; ((1 2 3) 4 5 6)
-; This is unexpected. `cons` accept a list as the second argument!
+; This is unexpected. `cons` accepts a list as the second argument!
 ; We can thing of `cons` as  scala's :: operator. It appends an element
 ; to the front of the second argument!
 
