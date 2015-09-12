@@ -101,5 +101,5 @@
 ; T(n) = 2*T(n/2) + constant
 
 ; Which is the characteristic time complexity of a simple tree traversal, since
-; the time complexity of each visited state is constant. A solution for it is
-; O(logn)
+; we visit each node once and the time complexity of each visit is constant.
+; A solution for it is O(n)
