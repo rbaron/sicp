@@ -56,7 +56,7 @@
 
 (define (successive-merge leaf-set)
   (if (eq? (length leaf-set) 1)
-    leaf-set
+    (car leaf-set)
     (let ((right (car leaf-set))
           (left (cadr leaf-set)))
       (successive-merge
@@ -68,7 +68,7 @@
 (define pairs '((a 4) (b 1) (c 2)))
 
 (generate-huffman-tree pairs)
-; => (((leaf a 4) ((leaf c 2) (leaf b 1) (c b) 3) (a c b) 7))
+; => ((leaf a 4) ((leaf c 2) (leaf b 1) (c b) 3) (a c b) 7)
 
 ; The result corresponds to the tree:
 
