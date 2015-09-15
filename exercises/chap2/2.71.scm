@@ -1,6 +1,6 @@
 ; How many bits are needed to represent n symbols using Huffman trees?
 
-; The requests trees are sketched on:
+; The requested trees are sketched on:
 ; - 2.71.a.jpg for n = 5;
 ; - 2.72.b.jpg for n = 10.
 
