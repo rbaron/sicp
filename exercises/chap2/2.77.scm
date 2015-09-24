@@ -38,7 +38,7 @@
 ; causes a new entry to be added on the lookup table. It'll look like:
 
 ;                               TYPE
-;                     'rectangular      'polar     '(complex)
+;                     'rectangular      'polar     'complex
 ;                    __________________________________________
 ; OP  'magnitude    |  rect-mag  |  polar-mag   |  magnitude  |
 ;                    __________________________________________
