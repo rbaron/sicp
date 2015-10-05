@@ -18,20 +18,19 @@
                      ;; <compute rest of result recursively>
                      (div-terms
                         (sub-terms L1
-                                   (mul-terms (make-term new-o new c) L2))
+                                   (mul-term-by-all-terms (make-term new-o new-c) L2))
                         L2)
                      ))
                 ;;<form complete result>
-                (adjoin-term (make-term new-o new-c) rest-of-result)
-                ))))))
-
+                (list (adjoin-term (make-term new-o new-c) (car rest-of-result))
+                      (cadr rest-of-result))))))))
 
 ; 2. Let's define the higher level `div-poly` procedure
-
 (define (div-poly p1 p2)
   (if (same-variable? (variable p1) (variable p2))
-    (make-poly (variable p1)
-               (div-terms (term-list p1)
-                          (term-list p2)))
-    (error "Polys not in same var -- ADD-POLY"
-           (list p1 p2))))
+      (let ((variable (variable p1))
+            (result (div-terms (term-list p1) (term-list p2))))
+        (list (make-poly variable (car result))
+              (make-poly variable (cadr result))))
+      (error "Polys not in same var -- DIV-POLY"
+             (list p1 p2))))
