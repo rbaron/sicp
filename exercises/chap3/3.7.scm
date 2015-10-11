@@ -31,6 +31,11 @@
   ; The "original" bank account operates on the default password
   (make-dispatcher password))
 
+; To be compliant with the request interface, let's create a `make-joint`
+; procedure
+(define (make-joint account password new-password)
+  ((account password 'make-joint) new-password))
+
 
 ; Solution
 
@@ -45,7 +50,8 @@
 ; => 60
 
 ; Let's create a joint account
-(define acc-joint ((acc 'secret-password 'make-joint) 'new-pass))
+;(define acc-joint ((acc 'secret-password 'make-joint) 'new-pass))
+(define acc-joint (make-joint acc 'secret-password 'new-pass))
 
 ; The account now hold a balance of 60. Let's withdraw 20 from the
 ; joint account. We expect the result to be 40.
@@ -61,4 +67,3 @@
 ; funds.
 ((acc 'secret-password 'withdraw) 50)
 ; => "Insufficient funds"
-
