@@ -1,20 +1,46 @@
-; Analyzing the flaw in Louis' `squarer`
+; Making a correct `squarer` constraint block
 
-; Here's Louis' procedure for squaring a number:
+; Let's complete this given skeleton:
+
+; (define (squarer a b)
+;   (define (process-new-value)
+;     (if (has-value? b)
+;         (if (< (get-value b) 0)
+;             (error "square less than 0 -- SQUARER" (get-value b))
+;             <alternative1>)
+;         <alternative2>))
+;   (define (process-forget-value) <body1>)
+;   (define (me request) <body2>)
+;   <rest of definition>
+;   me)
 
 (define (squarer a b)
-  (multiplier a a b))
+  (define (process-new-value)
+    (if (has-value? b)
+        (if (< (get-value b) 0)
+            (error "square less than 0 -- SQUARER" (get-value b))
+            (set-value! a (sqrt (get-value b)) me))
+        (if (has-value? a)
+            (set-value! b (expt 2 (get-value a)) me))))
 
-; The problem lies in the fact that the first and
-; second argument of squarer are the same. This has a strange
-; effect on calcularing the "reverse" operation:
+  (define (process-forget-value)
+    (forget-value! a me)
+    (forget-value! b me)
+    (process-new-value))
 
-; When a new value for `b` is set, `b` will call the multiplier's
-; `process-new-value`, but it will _not_ execute anything, since
-; it will dedude there aren't enough active connections for a new
-; value to be propagated.
+  (define (me request)
+    (cond ((eq? request 'I-have-a-value)
+           (process-new-value))
+          ((eq? request 'I-lost-my-value)
+           (process-forget-value))
+          (else
+           (error "Unknown request -- ADDER" request))))
 
-; Let's test this analysis at the end of the file.
+  (connect a me)
+  (connect b me)
+  me)
+
+; (Testing at the end of the file)
 
 ; ===============================
 ;        BEGIN CODE COPY
@@ -204,7 +230,10 @@
 ; Probe: a = ?
 ; ;Value: done
 
-(set-value! B 2 'user)
-; => This does not activate `A`! Just like we predicted:
+ (set-value! B 2 'user)
+; Probe: a = 1.4142135623730951
 ; Probe: b = 2
-; Value: done
+; ;Value: done
+
+; Great! Now `squarer` works as fully functional constraint block!
+
