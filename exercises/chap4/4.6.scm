@@ -10,7 +10,7 @@
   (cadr exp))
 
 (define (let-body exp)
-  (caddr exp))
+  (cddr exp))
 
 (define (let-argument-names exp)
   (map car (let-arguments exp)))
