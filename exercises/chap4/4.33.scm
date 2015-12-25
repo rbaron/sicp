@@ -18,19 +18,17 @@
 
 ; Option 2 seems more interesting. Here it is:
 
-(define scheme-cons cons)
-(define scheme-car car)
-(define scheme-cdr cdr)
-
 (load "book-code/ch4-mceval.scm")
 (load "book-code/ch4-leval.scm")
 
 (define (scheme-list->leval-list lst env)
-  (if (null? lst) '()
-      (apply (eval 'cons env)
-             (list (car lst)
-                   (list 'quote (cdr lst) env))
-              env)))
+  (if (null? lst)
+      '()
+      (eval
+        (list 'cons
+              (car lst)
+              (list 'quote (cdr lst)))
+        env)))
 
 ; Override `text-of-quotation` used by `eval`:
 (define (text-of-quotation exp)
