@@ -56,6 +56,10 @@
   (force-it (eval exp env)))
 
 (define (apply procedure arguments env)
+  ;(display "\nApplying: ")
+  ;(display (procedure-body procedure))
+  ;(display "\n\tArguments: ")
+  ;(display arguments)
   (cond ((primitive-procedure? procedure)
          (apply-primitive-procedure
           procedure

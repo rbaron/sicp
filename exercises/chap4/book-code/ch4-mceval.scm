@@ -235,6 +235,7 @@
   (set-cdr! frame (cons val (cdr frame))))
 
 (define (extend-environment vars vals base-env)
+  (display "\n\t Extending env: ")(display vars)
   (if (= (length vars) (length vals))
       (cons (make-frame vars vals) base-env)
       (if (< (length vars) (length vals))
@@ -242,6 +243,7 @@
           (error "Too few arguments supplied" vars vals))))
 
 (define (lookup-variable-value var env)
+  (display "\n\t Looking up variable: ")(display var)
   (define (env-loop env)
     (define (scan vars vals)
       (cond ((null? vars)
