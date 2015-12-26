@@ -26,7 +26,7 @@
 ;;**implementation-dependent loading of evaluator file
 ;;Note: It is loaded first so that the section 4.2 definition
 ;; of eval overrides the definition from 4.1.1
-(load "ch4-mceval.scm")
+;(load "ch4-mceval.scm")
 
 
 
@@ -38,7 +38,7 @@
 ;; analyze from 4.1.6, with clause from 4.3.3 added
 ;; and also support for Let
 (define (analyze exp)
-  (cond ((self-evaluating? exp) 
+  (cond ((self-evaluating? exp)
          (analyze-self-evaluating exp))
         ((quoted? exp) (analyze-quoted exp))
         ((variable? exp) (analyze-variable exp))
@@ -122,7 +122,7 @@
   (let ((var (definition-variable exp))
         (vproc (analyze (definition-value exp))))
     (lambda (env succeed fail)
-      (vproc env                        
+      (vproc env
              (lambda (val fail2)
                (define-variable! var val env)
                (succeed 'ok fail2))
@@ -135,7 +135,7 @@
       (vproc env
              (lambda (val fail2)        ; *1*
                (let ((old-value
-                      (lookup-variable-value var env))) 
+                      (lookup-variable-value var env)))
                  (set-variable-value! var val env)
                  (succeed 'ok
                           (lambda ()    ; *2*
@@ -259,7 +259,7 @@
     (make-combination (make-lambda (map let-var bindings)
                                    (let-body exp))
                       (map let-val bindings))))
-                     
+
 
 
 ;; A longer list of primitives -- suitable for running everything in 4.3
