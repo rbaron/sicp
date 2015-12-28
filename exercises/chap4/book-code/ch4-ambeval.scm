@@ -28,7 +28,9 @@
 ;; of eval overrides the definition from 4.1.1
 ;(load "ch4-mceval.scm")
 
-
+; ===========================
+; rbaron's note: lines starting with ;r are my personal comments
+; ===========================
 
 ;;;Code from SECTION 4.3.3, modified as needed to run it
 
@@ -37,6 +39,17 @@
 
 ;; analyze from 4.1.6, with clause from 4.3.3 added
 ;; and also support for Let
+
+;r Analyzing an expression results in a lambda procedure.
+;r This procedure receives as arguments:
+;r - `env`: the enrvironment in which the procedure will be executed;
+;r - `succeed (val, next-alternative)`: a procedure to be evaluated in case of success
+;r   -- `succeed` itself has the arguments:
+;r     -- `val`: the value to be announced
+;r     -- `next-alternative`: the next value to be considered, since the Amb evaluator
+;r                            handles multiple values (form the user's perspective)
+;r - `fail ()`: a procedure to be run in case of failed computation
+
 (define (analyze exp)
   (cond ((self-evaluating? exp)
          (analyze-self-evaluating exp))
@@ -59,6 +72,9 @@
 
 ;;;Simple expressions
 
+;r Analyzing a self evaluating expression yields:
+;r - `lambda (env succeed fail)`, which upon evaluation
+;r   will run the `succeed (val=exp, next-alternative=fail)`
 (define (analyze-self-evaluating exp)
   (lambda (env succeed fail)
     (succeed exp fail)))
@@ -82,6 +98,13 @@
 
 ;;;Conditionals and sequences
 
+;r Analyzing `if` yields a `lambda`
+;r - `lambda (env, succeed, fail)`
+;r This lambda will apply the analyzed predicate procedure
+;r passing the `succeed` procedure to it. This `succeed` procedure
+;r is responsible for taking the value of the predicate and either
+;r dispatching the consequent of the alternative analyzed procedures.
+
 (define (analyze-if exp)
   (let ((pproc (analyze (if-predicate exp)))
         (cproc (analyze (if-consequent exp)))
@@ -90,6 +113,10 @@
       (pproc env
              ;; success continuation for evaluating the predicate
              ;; to obtain pred-value
+
+             ;r `succeed(val, next-alternative)`
+             ;r Why call `next-alternative` `fail2` here?
+             ;r What if the predicate is an `amb` expression too?
              (lambda (pred-value fail2)
                (if (true? pred-value)
                    (cproc env succeed fail2)
@@ -97,6 +124,10 @@
              ;; failure continuation for evaluating the predicate
              fail))))
 
+;r `analyze-sequence` _chains_ the first analyzed procedure by
+;r making the `succeed` procedure (passed as argument to it)
+;r evaluate the second one and so on. If any procedure fails,
+;r no further call is made.
 (define (analyze-sequence exps)
   (define (sequentially a b)
     (lambda (env succeed fail)
@@ -150,8 +181,15 @@
 (define (analyze-application exp)
   (let ((fproc (analyze (operator exp)))
         (aprocs (map analyze (operands exp))))
+
+    ;r Result of analyzing an application: `lambda (env, succeed (val, next-val), fail ())`
     (lambda (env succeed fail)
+
+      ;r This lambda calls the operator's `lambda (env, succeed (val, next-val), fail ())`
       (fproc env
+
+             ;r `Succeed (val, next-val)` for the application is a lambda
+             ;r whose body is a call to `get-args`
              (lambda (proc fail2)
                (get-args aprocs
                          env
@@ -195,6 +233,15 @@
 
 ;;;amb expressions
 
+; Here's the interesting part and the reason we're dealing with
+; so many `succeed` and `fail` everywhere.
+
+; Analyzing an `amb` expression will also yield a `lambda`,
+; which receives as arguments:
+; - `env`
+; - `succeed (val, next-alternative)`
+; - `fail ()`
+
 (define (analyze-amb exp)
   (let ((cprocs (map analyze (amb-choices exp))))
     (lambda (env succeed fail)
@@ -203,6 +250,11 @@
             (fail)
             ((car choices) env
                            succeed
+
+                           ;r Here's the magic. `fail` for a `cproc` automatically
+                           ;r calls `try-next`! This is how `amb` types traverse all
+                           ;r possible values. As stated in the book, this is a DFS,
+                           ;r which backtracks whenever a value "fails" to compute.
                            (lambda ()
                              (try-next (cdr choices))))))
       (try-next cprocs))))
@@ -288,6 +340,9 @@
         (list 'integer? integer?)
         (list 'sqrt sqrt)
         (list 'eq? eq?)
+        (list '/ /)
+        (list 'odd? odd?)
+        (list 'even? even?)
 ;;      more primitives
         ))
 
