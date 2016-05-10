@@ -250,11 +250,6 @@
             (fail)
             ((car choices) env
                            succeed
-
-                           ;r Here's the magic. `fail` for a `cproc` automatically
-                           ;r calls `try-next`! This is how `amb` types traverse all
-                           ;r possible values. As stated in the book, this is a DFS,
-                           ;r which backtracks whenever a value "fails" to compute.
                            (lambda ()
                              (try-next (cdr choices))))))
       (try-next cprocs))))
