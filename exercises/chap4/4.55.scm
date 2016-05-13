@@ -2,7 +2,7 @@
 
 ; all people supervised by Ben Bitdiddle;
 
-; => (supervisor ?name (Ben Bitwiddle))
+; => (supervisor ?name (Ben Bitdiddle))
 
 ; b. the names and jobs of all people in the accounting division;
 
