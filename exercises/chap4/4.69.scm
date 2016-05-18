@@ -58,19 +58,21 @@
 
 ; Step 3: Write the rule
 
-;(assert!
-;  (rule ((great . ?rest) ?G ?S)
-;    (and (ends-with-grandson ?rest)
-;         (or (and (or (son ?P ?S)
-;                      (family ?wife ?P ?S))
-;                  (?rest ?G ?P))
-;             (and (or (son ?GG ?G)
-;                      (family ?wife ?GG ?G))
-;                  (or (son ?P ?S)
-;                      (family ?wife ?P ?S))
-;                  ((great . ?rest) ?GG ?P))))))
+(assert!
+  (rule ((great . ?rest) ?G ?S)
+    (and (ends-with-grandson ?rest)
+         (or (and (or (son ?P ?S)
+                      (family ?wife ?P ?S))
+                  (?rest ?G ?P))
+             (and (or (son ?GG ?G)
+                      (family ?wife ?GG ?G))
+                  (or (son ?P ?S)
+                      (family ?wife ?P ?S))
+                  ((great . ?rest) ?GG ?P))))))
 
 ; Testing
+
+; 1.
 ((great grandson) ?g ?ggs)
 ; => ((great grandson) adam irad)
 ; => ((great grandson) mehujael jubal)
@@ -91,7 +93,8 @@
 ; Since it won't go up nor down in the family tree and neither
 ; account for wife-husband-son relationships.
 
-(?relationship Adam Irad)
+; 2. (Uncomment to test, since it hangs ;P)
+;(?relationship Adam Irad)
 ; => ((great grandson) adam irad)
 ; Hangs.
 
@@ -99,3 +102,7 @@
 ; ?relationship will match agains (great . ?rest) and the recursive
 ; assertion will also match it again, resulting in the same assertion
 ; as the original one, causing the program to loop.
+
+; 3.
+(?relationship Adam Jubal)
+; => ((great great great great great grandson) adam jubal)
