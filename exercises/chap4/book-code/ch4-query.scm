@@ -147,6 +147,12 @@
         (singleton-stream match-result))))
 
 (define (pattern-match pat dat frame)
+  ;(newline)
+  ;(display "Will match: ")
+  ;(display pat)
+  ;(display " against ")
+  ;(display dat)
+  ;(newline)
   (cond ((eq? frame 'failed) 'failed)
         ((equal? pat dat) frame)
         ((var? pat) (extend-if-consistent pat dat frame))
@@ -430,7 +436,7 @@
 
 (define (contract-question-mark variable)
   (string->symbol
-   (string-append "?" 
+   (string-append "?"
      (if (number? (cadr variable))
          (string-append (symbol->string (caddr variable))
                         "-"
@@ -533,7 +539,7 @@
                       (cons (list key-1
                                   (cons key-2 value))
                             (cdr local-table)))))
-      'ok)    
+      'ok)
     (define (dispatch m)
       (cond ((eq? m 'lookup-proc) lookup)
             ((eq? m 'insert-proc!) insert!)
