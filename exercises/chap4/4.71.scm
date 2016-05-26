@@ -1,5 +1,8 @@
 ; Delayed vs. eager evaluation of rules
 
+; Load this file and drop yourself in the REPL with:
+; $ cat 4.71.scm - | mit-scheme
+
 ; Louis is interested in evaulating the difference between the
 ; used simple-query procedure:
 

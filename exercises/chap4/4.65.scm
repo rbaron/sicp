@@ -1,7 +1,7 @@
 ; Multiple wheels
 
 ; Load this file and drop yourself in the REPL with:
-; $ cat 4.63.scm - | mit-scheme
+; $ cat 4.65.scm - | mit-scheme
 
 (load "book-code/ch4-query")
 
