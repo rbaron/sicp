@@ -214,6 +214,10 @@
         (else 'failed)))
 
 (define (extend-if-possible var val frame)
+  ;(display "\nExtend if possible")
+  ;(display "\n\tVar ")(display var)
+  ;(display "\n\tVal ")(display val)
+  ;(display "\n\tFrame ")(display frame)
   (let ((binding (binding-in-frame var frame)))
     (cond (binding
            (unify-match
