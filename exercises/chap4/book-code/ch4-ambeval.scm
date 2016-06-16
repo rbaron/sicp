@@ -339,6 +339,9 @@
         (list 'odd? odd?)
         (list 'even? even?)
 ;;      more primitives
+        (list 'assoc assoc)
+        (list 'equal? equal?)
+        (list 'pair? pair?)
         ))
 
 
