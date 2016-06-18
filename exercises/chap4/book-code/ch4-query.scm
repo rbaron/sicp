@@ -142,6 +142,7 @@
 (define (check-an-assertion assertion query-pat query-frame)
   (let ((match-result
          (pattern-match query-pat assertion query-frame)))
+    ;(display "\nMatched result: ")(display match-result)
     (if (eq? match-result 'failed)
         the-empty-stream
         (singleton-stream match-result))))
@@ -180,10 +181,12 @@
 
 (define (apply-a-rule rule query-pattern query-frame)
   (let ((clean-rule (rename-variables-in rule)))
+    ;(display "\nRenamed rule: ")(display clean-rule)
     (let ((unify-result
            (unify-match query-pattern
                         (conclusion clean-rule)
                         query-frame)))
+      ;(display "\nUnified result: ")(display unify-result)
       (if (eq? unify-result 'failed)
           the-empty-stream
           (qeval (rule-body clean-rule)
@@ -215,7 +218,7 @@
 
 (define (extend-if-possible var val frame)
   ;(display "\nExtend if possible")
-  ;(display "\n\tVar ")(display var)
+  ;(display "\n\tVar ")(displany var)
   ;(display "\n\tVal ")(display val)
   ;(display "\n\tFrame ")(display frame)
   (let ((binding (binding-in-frame var frame)))
