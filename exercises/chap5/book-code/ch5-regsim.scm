@@ -195,6 +195,7 @@
         (ops (machine 'operations)))
     (for-each
      (lambda (inst)
+       ;(display "\nOn assemble of inst ")(display inst)(display ": ")(display stack)
        (set-instruction-execution-proc!
         inst
         (make-execution-procedure
