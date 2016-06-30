@@ -3,7 +3,8 @@
 
 ;;;;FIRST A LOT FROM 4.1.2-4.1.4
 
-(load "ch5-syntax.scm");               ;section 4.1.2 syntax procedures
+;(load "ch5-syntax.scm");               ;section 4.1.2 syntax procedures
+(load "book-code/ch5-syntax.scm");               ;section 4.1.2 syntax procedures
 
 ;;;SECTION 4.1.3
 ;;; operations used by compiled code and eceval except as noted

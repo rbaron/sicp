@@ -107,6 +107,9 @@
 
 ;; non-memoizing version of force-it
 
+(define (actual-value exp env)
+  (force-it (eval exp env)))
+
 (define (force-it obj)
   (if (thunk? obj)
       (actual-value (thunk-exp obj) (thunk-env obj))
