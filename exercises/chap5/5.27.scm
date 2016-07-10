@@ -24,34 +24,34 @@
 
 (display "\nFor 1:\n")
 (iter-factorial 1)
-(total-pushes = 64 maximum-depth = 10)
+; (total-pushes = 64 maximum-depth = 10)
 (rec-factorial 1)
-(total-pushes = 16 maximum-depth = 8)
+; (total-pushes = 16 maximum-depth = 8)
 
 (display "\nFor 2:\n")
 (iter-factorial 2)
-(total-pushes = 99 maximum-depth = 10)
+; (total-pushes = 99 maximum-depth = 10)
 (rec-factorial 2)
-(total-pushes = 48 maximum-depth = 13)
+; (total-pushes = 48 maximum-depth = 13)
 
 
 (display "\nFor 3:\n")
 (iter-factorial 3)
-(total-pushes = 134 maximum-depth = 10)
+; (total-pushes = 134 maximum-depth = 10)
 (rec-factorial 3)
-(total-pushes = 80 maximum-depth = 18)
+; (total-pushes = 80 maximum-depth = 18)
 
 (display "\nFor 4:\n")
 (iter-factorial 4)
-(total-pushes = 169 maximum-depth = 10)
+; (total-pushes = 169 maximum-depth = 10)
 (rec-factorial 4)
-(total-pushes = 112 maximum-depth = 23)
+; (total-pushes = 112 maximum-depth = 23)
 
 (display "\nFor 5:\n")
 (iter-factorial 5)
-(total-pushes = 204 maximum-depth = 10)
+; (total-pushes = 204 maximum-depth = 10)
 (rec-factorial 5)
-(total-pushes = 144 maximum-depth = 28)
+; (total-pushes = 144 maximum-depth = 28)
 
 
 ; For iter-factorial we have already found the max depth and
@@ -82,8 +82,8 @@
 
 ; Summarizing:
 
-;                |  maximum-depth  | total-pushes
-;---------------------------------------------------
-;rec-factorial   |      5n + 3     |    32n - 16
-;iter-factorial  |      10         |    35n + 29
+;                 |  maximum-depth  | total-pushes
+; ---------------------------------------------------
+; rec-factorial   |      5n + 3     |    32n - 16
+; iter-factorial  |      10         |    35n + 29
 
