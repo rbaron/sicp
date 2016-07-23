@@ -12,7 +12,8 @@
 ;;;;Then you can compile Scheme programs as shown in section 5.5.5
 
 ;;**implementation-dependent loading of syntax procedures
-(load "ch5-syntax.scm")			;section 4.1.2 syntax procedures
+;(load "ch5-syntax.scm")			;section 4.1.2 syntax procedures
+(load "book-code/ch5-syntax.scm")
 
 
 ;;;SECTION 5.5.1
@@ -133,7 +134,7 @@
 
 (define (compile-if exp target linkage)
   (let ((t-branch (make-label 'true-branch))
-        (f-branch (make-label 'false-branch))                    
+        (f-branch (make-label 'false-branch))
         (after-if (make-label 'after-if)))
     (let ((consequent-linkage
            (if (eq? linkage 'next) after-if linkage)))
