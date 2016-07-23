@@ -1,6 +1,6 @@
-; Compiling factorial
+; Compiling factorial-alt
 
-; Load this file and drop yourself in the REPL with:
+; Load this file
 ; $ cat 5.33.scm - | mit-scheme
 
 (load "book-code/load-eceval-compiler.scm")
