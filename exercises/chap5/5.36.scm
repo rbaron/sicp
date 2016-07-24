@@ -145,3 +145,6 @@
 (define machine (simulate instructions))
 (get-register-contents machine 'val)
 ; => 3
+
+; Using cons-end instead of cons adds complexity to the runtime. Adding elements
+; to the end of lists take O(n) while adding elements to the head take O(1).
