@@ -136,6 +136,15 @@
           (if (null? insts)
               'done
               (begin
+                ;(display "\nEXECUTING: ")
+                ;(display (car insts))
+                ;(display "\nREGS: ")
+                ;(display register-table)
+                ;(for-each (lambda (r) (display "\n\t")
+                ;                      (display (car r))
+                ;                      (display ": ")
+                ;                      (display (get-contents (cadr r))))
+                ;          register-table)
                 ((instruction-execution-proc (car insts)))
                 (execute)))))
       (define (dispatch message)
