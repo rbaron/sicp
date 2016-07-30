@@ -10,7 +10,7 @@
       (let ((index-in-frame (index-of var (car current-env))))
         (if (eq? index-in-frame 'not-found)
           (search-frame (cdr current-env) (+ frame-counter 1))
-          (list frame-counter index-in-frame)))))
+          (cons frame-counter index-in-frame)))))
   (search-frame compile-time-env 0))
 
 (define (index-of elem lst)
