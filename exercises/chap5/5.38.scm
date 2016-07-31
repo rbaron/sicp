@@ -32,31 +32,7 @@
 (define (spread-arguments argument-codes)
   (let ((arg1-comp (compile (car argument-codes) 'arg1 'next))
         (arg2-comp (compile (cadr argument-codes) 'arg2 'next)))
-    (preserving '(env arg1 arg2)
-                arg1-comp
-                arg2-comp)))
-
-(pprint-instrs
-  (get-instructions
-    (spread-arguments '(1 (+ 1 2)))))
-; => (assign arg1 (const 1))
-; => (assign proc (op lookup-variable-value) (const +) (reg env))
-; => (assign val (const 2))
-; => (assign argl (op list) (reg val))
-; => (assign val (const 1))
-; => (assign argl (op cons) (reg val) (reg argl))
-; => (test (op primitive-procedure?) (reg proc))
-; => (branch (label primitive-branch3))
-; => compiled-branch2
-; => (assign continue (label proc-return4))
-; => (assign val (op compiled-procedure-entry) (reg proc))
-; => (goto (reg val))
-; => proc-return4
-; => (assign arg2 (reg val))
-; => (goto (label after-call1))
-; => primitive-branch3
-; => (assign arg2 (op apply-primitive-procedure) (reg proc) (reg argl))
-; => after-call1
+    (list arg1-comp arg2-comp)))
 
 ; b.
 
@@ -64,11 +40,14 @@
   (let* ((operand-code (car exp))
          (arg-codes (cdr exp))
          (comp-arg-codes (spread-arguments arg-codes)))
-    (append-instruction-sequences
-     comp-arg-codes
-     (make-instruction-sequence '(arg1 arg2)
-                                `(,target)
-                                `((assign ,target (op ,operand-code) (reg arg1) (reg arg2)))))))
+    (end-with-linkage linkage
+      (append-instruction-sequences
+        (car comp-arg-codes)
+         (preserving '(arg1)
+           (cadr comp-arg-codes)
+           (make-instruction-sequence '(arg1 arg2)
+                                      `(,target)
+                                      `((assign ,target (op ,operand-code) (reg arg1) (reg arg2)))))))))
 
 (pprint-instrs
   (get-instructions
@@ -125,14 +104,14 @@
 
 (pprint-instrs (get-instructions result))
 
-;    (assign val (op make-compiled-procedure) (label entry6) (reg env))
-;    (goto (label after-lambda5))
-;    entry6
+;    (assign val (op make-compiled-procedure) (label entry2) (reg env))
+;    (goto (label after-lambda1))
+;    entry2
 ;    (assign env (op compiled-procedure-env) (reg proc))
 ;    (assign env (op extend-environment) (const (n)) (reg argl) (reg env))
-;    (assign val (op make-compiled-procedure) (label entry11) (reg env))
-;    (goto (label after-lambda10))
-;    entry11
+;    (assign val (op make-compiled-procedure) (label entry7) (reg env))
+;    (goto (label after-lambda6))
+;    entry7
 ;    (assign env (op compiled-procedure-env) (reg proc))
 ;    (assign env (op extend-environment) (const (product counter)) (reg argl) (reg env))
 ;    (save continue)
@@ -143,49 +122,51 @@
 ;    (assign val (op lookup-variable-value) (const counter) (reg env))
 ;    (assign argl (op cons) (reg val) (reg argl))
 ;    (test (op primitive-procedure?) (reg proc))
-;    (branch (label primitive-branch20))
-;    compiled-branch19
-;    (assign continue (label after-call18))
+;    (branch (label primitive-branch16))
+;    compiled-branch15
+;    (assign continue (label after-call14))
 ;    (assign val (op compiled-procedure-entry) (reg proc))
 ;    (goto (reg val))
-;    primitive-branch20
+;    primitive-branch16
 ;    (assign val (op apply-primitive-procedure) (reg proc) (reg argl))
-;    after-call18
+;    after-call14
 ;    (restore env)
 ;    (restore continue)
 ;    (test (op false?) (reg val))
-;    (branch (label false-branch13))
-;    true-branch14
+;    (branch (label false-branch9))
+;    true-branch10
 ;    (assign val (op lookup-variable-value) (const product) (reg env))
 ;    (goto (reg continue))
-;    false-branch13
+;    false-branch9
 ;    (assign proc (op lookup-variable-value) (const iter) (reg env))
 
      ; Here's the difference. While calculating (+ counter 1), the compiler now
      ; optimizes so that, instead of building the argument list in argl and applying
      ; a procedure, it generates code that put those arguments into arg1 and arg2 and
      ; call a machine primitive right away.
+
 ;    (assign arg1 (op lookup-variable-value) (const counter) (reg env))
 ;    (assign arg2 (const 1))
 ;    (assign val (op +) (reg arg1) (reg arg2))
 ;    (assign argl (op list) (reg val))
 
      ; Same goes for the call (* counter product)
+
 ;    (assign arg1 (op lookup-variable-value) (const counter) (reg env))
 ;    (assign arg2 (op lookup-variable-value) (const product) (reg env))
 ;    (assign val (op *) (reg arg1) (reg arg2))
 ;    (assign argl (op cons) (reg val) (reg argl))
 ;    (test (op primitive-procedure?) (reg proc))
-;    (branch (label primitive-branch17))
-;    compiled-branch16
+;    (branch (label primitive-branch13))
+;    compiled-branch12
 ;    (assign val (op compiled-procedure-entry) (reg proc))
 ;    (goto (reg val))
-;    primitive-branch17
+;    primitive-branch13
 ;    (assign val (op apply-primitive-procedure) (reg proc) (reg argl))
 ;    (goto (reg continue))
-;    after-call15
-;    after-if12
-;    after-lambda10
+;    after-call11
+;    after-if8
+;    after-lambda6
 ;    (perform (op define-variable!) (const iter) (reg val) (reg env))
 ;    (assign val (const ok))
 ;    (assign proc (op lookup-variable-value) (const iter) (reg env))
@@ -194,15 +175,15 @@
 ;    (assign val (const 1))
 ;    (assign argl (op cons) (reg val) (reg argl))
 ;    (test (op primitive-procedure?) (reg proc))
-;    (branch (label primitive-branch9))
-;    compiled-branch8
+;    (branch (label primitive-branch5))
+;    compiled-branch4
 ;    (assign val (op compiled-procedure-entry) (reg proc))
 ;    (goto (reg val))
-;    primitive-branch9
+;    primitive-branch5
 ;    (assign val (op apply-primitive-procedure) (reg proc) (reg argl))
 ;    (goto (reg continue))
-;    after-call7
-;    after-lambda5
+;    after-call3
+;    after-lambda1
 ;    (perform (op define-variable!) (const factorial) (reg val) (reg env))
 ;    (assign val (const ok))
 
@@ -214,7 +195,7 @@
 ; (+ 1 2 3) => (+ (+ 1 2) 3)
 
 ; I used the register arg1 as the accumulator and compiled the arguments successively
-; into arg2. The
+; into arg2.
 
 (define (open-code-generator exp target linkage)
   (let* ((operand-code (car exp))
@@ -224,23 +205,25 @@
       (if (null? remaining-arg-codes)
         (empty-instruction-sequence)
         (let ((comp-first-arg (compile (car remaining-arg-codes) 'arg2 'next)))
-          (append-instruction-sequences
-            comp-first-arg
+          (end-with-linkage linkage
             (append-instruction-sequences
-              (make-instruction-sequence '(arg1 arg2)
-                                         '(arg1)
-                                         `((assign arg1 (op ,operand-code) (reg arg1) (reg arg2))))
-              (reduce (cdr remaining-arg-codes)))))))
+              comp-first-arg
+              (append-instruction-sequences
+                (make-instruction-sequence '(arg1 arg2)
+                                           '(arg1)
+                                           `((assign arg1 (op ,operand-code) (reg arg1) (reg arg2))))
+                (reduce (cdr remaining-arg-codes))))))))
 
      ; Initialize the register arg1 to the first compiled element from arg-codes
      (let ((comp-first-arg (compile (car arg-codes) 'arg1 'next)))
-       (append-instruction-sequences
-         comp-first-arg
+       (end-with-linkage linkage
          (append-instruction-sequences
-           (reduce (cdr arg-codes))
-           (make-instruction-sequence '(arg1)
-                                      `(,target)
-                                      `((assign ,target (reg arg1)))))))))
+           comp-first-arg
+           (append-instruction-sequences
+             (reduce (cdr arg-codes))
+             (make-instruction-sequence '(arg1)
+                                        `(,target)
+                                        `((assign ,target (reg arg1))))))))))
 
 (define result (compile
   '(+ 1 2 3)
