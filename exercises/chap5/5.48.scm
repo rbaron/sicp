@@ -1,146 +1,42 @@
-;;;;EXPLICIT-CONTROL EVALUATOR FROM SECTION 5.4 OF
-;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
-;;;; MODIFIED TO SUPPORT COMPILED CODE (AS IN SECTION 5.5.7)
+; Implementing compilation inside the REPL
 
-;;;;Changes to basic evaluator machine are
-;;;; (1) some new eceval controller code for the driver and apply-dispatch;
-;;;; (2) some additional machine operations from;
-;;;; (3) support for compiled code to call interpreted code (exercise 5.47) --
-;;;;     (new register and 1 new instruction at start)
-;;;; (4) new startup aid start-eceval
+; Load this file and drop yourself in the REPL with
+; $ cat 5.48.scm - | mit-scheme
 
-;; Explicit-control evaluator.
-;; To use it, load "load-eceval-compiler.scm", which loads this file and the
-;;  support it needs (including the register-machine simulator)
+(load "book-code/load-eceval-compiler.scm")
+(load "book-code/ch5-compiler.scm")
 
-;; To start, can use compile-and-go as in section 5.5.7
-;;  or start-eceval as in the section 5.5.7 footnote.
+; In order for the read-compile-print-loop to work, we need to add primitives
+; for compiling, as well new code sections in our evaluator. The new sections
+; are marker with an "Added" comment.
 
-;; To resume the machine without reinitializing the global environment
-;; if you have somehow interrupted out of the machine back to Scheme, do
+(define (compile-and-run? exp)
+  (tagged-list? exp 'compile-and-run))
 
-;: (set-register-contents! eceval 'flag false)
-;: (start eceval)
-
-;;;;;;;;
-
-;; any old value to create the variable so that
-;;  compile-and-go and/or start-eceval can set! it.
-(define the-global-environment '())
-
-;;; Interfacing compiled code with eceval machine
-;;; From section 5.5.7
-(define (start-eceval)
-  (set! the-global-environment (setup-environment))
-  (set-register-contents! eceval 'flag false)
-  (start eceval))
-
-;; Modification of section 4.1.4 procedure
-;; **replaces version in syntax file
-(define (user-print object)
-  (cond ((compound-procedure? object)
-         (display (list 'compound-procedure
-                        (procedure-parameters object)
-                        (procedure-body object)
-                        '<procedure-env>)))
-        ((compiled-procedure? object)
-         (display '<compiled-procedure>))
-        (else (display object))))
-
-(define (compile-and-go expression)
+(define (compile-and-run exp)
   (let ((instructions
          (assemble (statements
-                    (compile expression 'val 'return))
+                    (compile (extract-code exp) 'val 'return))
                    eceval)))
-    (set! the-global-environment (setup-environment))
-    (set-register-contents! eceval 'val instructions)
-    (set-register-contents! eceval 'flag true)
-    (start eceval)))
-
-;;**NB. To [not] monitor stack operations, comment in/[out] the line after
-;; print-result in the machine controller below
-;;**Also choose the desired make-stack version in regsim.scm
+    instructions))
+
+; exp here will be something like:
+; (compile-and-run (quote (+ 1 2)))
+; To extract (+ 1 2), we need to apply (cadr (cadr exp))
+(define (extract-code exp)
+  (cadr (cadr exp)))
 
 (define eceval-operations
-  (list
-   ;;primitive Scheme operations
-   (list 'read read)			;used by eceval
-
-   ;;used by compiled code
-   (list 'list list)
-   (list 'cons cons)
-
-   ;;operations in syntax.scm
-   (list 'self-evaluating? self-evaluating?)
-   (list 'quoted? quoted?)
-   (list 'text-of-quotation text-of-quotation)
-   (list 'variable? variable?)
-   (list 'assignment? assignment?)
-   (list 'assignment-variable assignment-variable)
-   (list 'assignment-value assignment-value)
-   (list 'definition? definition?)
-   (list 'definition-variable definition-variable)
-   (list 'definition-value definition-value)
-   (list 'lambda? lambda?)
-   (list 'lambda-parameters lambda-parameters)
-   (list 'lambda-body lambda-body)
-   (list 'if? if?)
-   (list 'if-predicate if-predicate)
-   (list 'if-consequent if-consequent)
-   (list 'if-alternative if-alternative)
-   (list 'begin? begin?)
-   (list 'begin-actions begin-actions)
-   (list 'last-exp? last-exp?)
-   (list 'first-exp first-exp)
-   (list 'rest-exps rest-exps)
-   (list 'application? application?)
-   (list 'operator operator)
-   (list 'operands operands)
-   (list 'no-operands? no-operands?)
-   (list 'first-operand first-operand)
-   (list 'rest-operands rest-operands)
-
-   ;;operations in eceval-support.scm
-   (list 'true? true?)
-   (list 'false? false?)		;for compiled code
-   (list 'make-procedure make-procedure)
-   (list 'compound-procedure? compound-procedure?)
-   (list 'procedure-parameters procedure-parameters)
-   (list 'procedure-body procedure-body)
-   (list 'procedure-environment procedure-environment)
-   (list 'extend-environment extend-environment)
-   (list 'lookup-variable-value lookup-variable-value)
-   (list 'set-variable-value! set-variable-value!)
-   (list 'define-variable! define-variable!)
-   (list 'primitive-procedure? primitive-procedure?)
-   (list 'apply-primitive-procedure apply-primitive-procedure)
-   (list 'prompt-for-input prompt-for-input)
-   (list 'announce-output announce-output)
-   (list 'user-print user-print)
-   (list 'empty-arglist empty-arglist)
-   (list 'adjoin-arg adjoin-arg)
-   (list 'last-operand? last-operand?)
-   (list 'no-more-exps? no-more-exps?)	;for non-tail-recursive machine
-   (list 'get-global-environment get-global-environment)
-
-   ;;for compiled code (also in eceval-support.scm)
-   (list 'make-compiled-procedure make-compiled-procedure)
-   (list 'compiled-procedure? compiled-procedure?)
-   (list 'compiled-procedure-entry compiled-procedure-entry)
-   (list 'compiled-procedure-env compiled-procedure-env)
-   ))
+  (cons (list 'compile-and-run compile-and-run)
+    (cons (list 'compile-and-run? compile-and-run?)
+         eceval-operations)))
 
 (define eceval
   (make-machine
-   '(exp env val proc argl continue unev
-	 compapp			;*for compiled to call interpreted
-	 )
+   '(exp env val proc argl continue unev compapp)
    eceval-operations
   '(
-;;SECTION 5.4.4, as modified in 5.5.7
-;;*for compiled to call interpreted (from exercise 5.47)
   (assign compapp (label compound-apply))
-;;*next instruction supports entry from compiler (from section 5.5.7)
   (branch (label external-entry))
 read-eval-print-loop
   (perform (op initialize-stack))
@@ -151,14 +47,12 @@ read-eval-print-loop
   (assign continue (label print-result))
   (goto (label eval-dispatch))
 print-result
-;;**following instruction optional -- if use it, need monitored stack
   (perform (op print-stack-statistics))
   (perform
    (op announce-output) (const ";;; EC-Eval value:"))
   (perform (op user-print) (reg val))
   (goto (label read-eval-print-loop))
 
-;;*support for entry from compiler (from section 5.5.7)
 external-entry
   (perform (op initialize-stack))
   (assign env (op get-global-environment))
@@ -178,10 +72,14 @@ signal-error
   (perform (op user-print) (reg val))
   (goto (label read-eval-print-loop))
 
-;;SECTION 5.4.1
 eval-dispatch
   (test (op self-evaluating?) (reg exp))
   (branch (label ev-self-eval))
+
+  ; Added
+  (test (op compile-and-run?) (reg exp))
+  (branch (label ev-compile-and-run))
+
   (test (op variable?) (reg exp))
   (branch (label ev-variable))
   (test (op quoted?) (reg exp))
@@ -199,6 +97,13 @@ eval-dispatch
   (test (op application?) (reg exp))
   (branch (label ev-application))
   (goto (label unknown-expression-type))
+
+; Added
+ev-compile-and-run
+  (assign val (op compile-and-run) (reg exp))
+  (goto (label external-entry))
+  (assign continue (label print-result))
+  (goto (reg val))
 
 ev-self-eval
   (assign val (reg exp))
@@ -367,4 +272,30 @@ ev-definition-1
   (goto (reg continue))
    )))
 
-'(EXPLICIT CONTROL EVALUATOR FOR COMPILER LOADED)
+; Kickoff the interpreter
+(set! the-global-environment (setup-environment))
+(set-register-contents! eceval 'flag false)
+(start eceval)
+
+; Testing
+
+(compile-and-run '(+ 1 2))
+; => 3
+
+(compile-and-run
+  '(define (inc x)
+    (+ x 1)))
+; => ok
+
+(inc 6)
+; => 7
+
+(compile-and-run
+  '(define (factorial n)
+    (if (= n 1)
+        1
+        (* (factorial (- n 1)) n))))
+; => ok
+
+(factorial 5)
+; => 120

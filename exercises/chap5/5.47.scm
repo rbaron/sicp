@@ -1,7 +1,7 @@
-; Measuring the performance of the compiled factorial procedure
+; Calling interpreted procedures from compiled procedures
 
 ; Load this file and drop yourself in the REPL with
-; $ cat 5.46.scm - | mit-scheme
+; $ cat 5.47.scm - | mit-scheme
 
 (load "book-code/load-eceval-compiler.scm")
 (load "book-code/ch5-compiler.scm")
