@@ -65,8 +65,9 @@ eval-dispatch
 ; Added
 ev-compile-and-run
   (assign val (op compile-and-run) (reg exp))
-  (goto (label external-entry))
   (assign continue (label print-result))
+
+  ; Jump to newly-compiled code's entry point
   (goto (reg val))
    )))
 
