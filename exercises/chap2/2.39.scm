@@ -11,7 +11,7 @@
 
 ; 1. Using `fold-left`:
 (define (reverse sequence)
-  (fold-left (lambda (el acc) (cons el acc) () sequence))
+  (fold-left (lambda (acc el) (cons el acc)) () sequence))
 
 ; Testing:
 (reverse (list 1 2 3 4))
